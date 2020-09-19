@@ -56,10 +56,13 @@ Your code here
 app.get('/authorize', function(req, res) {
 	status = 401;
 	reqClient = req.query.client_id;
-	reqScope = req.query.scope.split(" ");
-	if (reqClient in clients &&
-		containsAll(clients[reqClient].scopes, reqScope)) {
-		status = 200;		
+	if (reqClient in clients) {
+		reqScope = req.query.scope.split(" ");
+		if(containsAll(
+				clients[reqClient].scopes, 
+				reqScope)) {
+			status = 200;		
+		}
 	}
 	res.status(status).end();
 })
