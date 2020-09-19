@@ -54,16 +54,19 @@ app.use(bodyParser.urlencoded({ extended: true }))
 Your code here
 */
 app.get('/authorize', function(req, res) {
-	status = 401;
+	let status = 401;
+	let reqId = randomString();
 	reqClient = req.query.client_id;
 	if (reqClient in clients) {
 		reqScope = req.query.scope.split(" ");
 		if(containsAll(
 				clients[reqClient].scopes, 
 				reqScope)) {
-			status = 200;		
+			status = 200;
+			requests[reqId] = req.query;		
 		}
 	}
+
 	res.status(status).end();
 })
 
