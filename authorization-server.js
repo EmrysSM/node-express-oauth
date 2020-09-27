@@ -54,7 +54,7 @@ app.use(bodyParser.urlencoded({ extended: true }))
 Your code here
 */
 app.get('/authorize', function(req, res) {
-	let status = 401;
+	res.status(401);
 	let reqId = randomString();
 	reqClient = req.query.client_id;
 	if (reqClient in clients) {
@@ -62,7 +62,7 @@ app.get('/authorize', function(req, res) {
 		if(containsAll(
 				clients[reqClient].scopes, 
 				reqScope)) {
-			status = 200;
+			res.status(200);
 			requests[reqId] = req.query;
 			res.render('login', 
 									{
@@ -72,8 +72,7 @@ app.get('/authorize', function(req, res) {
 									});
 		}
 	}
-
-	res.status(status).end();
+	res.end();
 })
 
 const server = app.listen(config.port, "localhost", function () {
