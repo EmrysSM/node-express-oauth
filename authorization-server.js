@@ -64,7 +64,7 @@ app.get('/authorize', function(req, res) {
 				reqScope)) {
 			res.status(200);
 			requests[reqId] = req.query;
-			res.render('login', 
+			return res.render('login', 
 									{
 										'client': clients[reqClient],
 										'scope': reqScope,
@@ -72,8 +72,25 @@ app.get('/authorize', function(req, res) {
 									});
 		}
 	}
-	res.end();
-})
+	return res.end();
+});
+
+app.post('/approve', function(req, res) {
+	let un = req.body.userName;
+	let pw = req.body.password;
+	let reqId = req.body.requestId;  
+	let authKey = randomString();
+	if( users[un] === pw && requests[reqId]) {
+		let request = requests[reqId];
+		delete requests[reqId];
+		authorizationCodes[authKey] = {
+			clientReq: request,
+			userName: un
+		}
+		return res.status(200).end();
+	}
+	return res.status(401).end();
+});
 
 const server = app.listen(config.port, "localhost", function () {
 	var host = server.address().address
