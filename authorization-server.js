@@ -87,6 +87,7 @@ app.post('/approve', function(req, res) {
 			clientReq: request,
 			userName: un
 		}
+		res.redirect(req.redirect_uri + "?code=" + authKey + "&state=" + req.state);
 		return res.status(200).end();
 	}
 	return res.status(401).end();
