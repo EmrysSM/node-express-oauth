@@ -79,18 +79,36 @@ app.post('/approve', function(req, res) {
 	let un = req.body.userName;
 	let pw = req.body.password;
 	let reqId = req.body.requestId;  
-	let authKey = randomString();
+
 	if( users[un] === pw && requests[reqId]) {
 		let request = requests[reqId];
+		let authKey = randomString();
+
 		delete requests[reqId];
+		
 		authorizationCodes[authKey] = {
 			clientReq: request,
 			userName: un
 		}
-		res.redirect(req.redirect_uri + "?code=" + authKey + "&state=" + req.state);
-		return res.status(200).end();
+		
+		let redirectURL = new URL(request.redirect_uri);
+		redirectURL.searchParams.set('code', authKey);
+		redirectURL.searchParams.append('state', request.state);
+		return res.redirect(302, redirectURL.toString());
+		// return res.status(200).end();
 	}
 	return res.status(401).end();
+});
+
+app.post('/token', function(req, res) {
+	if(req.headers.hasOwnProperty('authorization')) {
+		let authObj = decodeAuthCredentials(req.headers.authorization);
+		if(clients[authObj.clientId] && 
+			clients[authObj.clientId].clientSecret === authObj.clientSecret) {
+			return res.status(200).end();
+		}
+	} 
+		return res.status(401).end();
 });
 
 const server = app.listen(config.port, "localhost", function () {
